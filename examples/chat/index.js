@@ -3,7 +3,8 @@ var express = require('express');
 var app = express();
 var path = require('path');
 var server = require('http').createServer(app);
-var io = require('../..')(server);
+const socketIO = require('socket.io');
+let io = socketIO(server);
 var port = process.env.PORT || 3000;
 
 server.listen(port, () => {
@@ -17,11 +18,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 var numUsers = 0;
 
-io.on('connection', (socket) => {
+io.on('connection', socket => {
   var addedUser = false;
 
   // when the client emits 'new message', this listens and executes
-  socket.on('new message', (data) => {
+  socket.on('new message', data => {
     // we tell the client to execute 'new message'
     socket.broadcast.emit('new message', {
       username: socket.username,
@@ -30,7 +31,7 @@ io.on('connection', (socket) => {
   });
 
   // when the client emits 'add user', this listens and executes
-  socket.on('add user', (username) => {
+  socket.on('add user', username => {
     if (addedUser) return;
 
     // we store the username in the socket session for this client
